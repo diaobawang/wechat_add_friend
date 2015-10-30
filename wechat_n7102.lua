@@ -19,13 +19,15 @@ initLog("wechat_fail.log", 0)
 remark = "coachT-学员"
 
 -- 数据文件路径
-path = "/mnt/sdcard/TouchSprite/lua/res2"
+path = "/mnt/sdcard/TouchSprite/lua/res3_100"
 
 local file = io.open(path,"r");
 
 
 principalWx="coachT"
-word = "您好，我是健身管家(coachT)客服"
+word = "您好，我是健身管家(coachT)的健身教练"
+
+local addToContactButtonY
 
 
 --   wechat button
@@ -61,8 +63,35 @@ function is_sameColor(r1, g1, b1, r2, g2, b2)
 end
 
 function isAddToContactButtonValid()
+    -- y coordinate is variable
+    local t1, t2 = conf["addToContact"][1], conf["addToContact"][2]
     local r, g, b = getColorRGB(conf["addToContact"][1], conf["addToContact"][2]);
-    return is_sameColor(r, g, b, 70, 191, 24)
+    --toast("test"..t1..t2, 1)
+    --mSleep(1000)
+    --toast("rgb"..r..g..b, 1)
+    --mSleep(1000)
+    local result = is_sameColor(r, g, b, 70, 191, 24)
+    local y
+    if result
+    then
+        toast("same")
+        addToContactButtonY = conf["addToContact"][2]
+    else
+        toast("not same")
+        for i = 580, 860, 20 
+        do
+            y = i;
+            toast("not same"..i, 0)
+            r, g, b = getColorRGB(conf["addToContact"][1], y);
+            result = is_sameColor(r, g, b, 70, 191, 24)
+            if result
+                then
+                    addToContactButtonY = y;
+                    break
+                end
+        end
+    end
+    return result
 end
 
 -- post request
@@ -192,7 +221,8 @@ for l in file:lines() do
         -- local addx, addy = findAddBtn()
         -- touchDU(addx, addy)
         
-        touchButtonForKey("addToContact")
+        --touchButtonForKey("addToContact")
+        touchDU(conf["addToContact"][1], addToContactButtonY)
         mSleep(2000)
 
 
@@ -209,12 +239,13 @@ for l in file:lines() do
         wLog("wechat_fail.log", current_time .. "  " .. tel .. " " .. remark)
         -- 记一条日志
         -- sendRequest(tel,2)
+        touchDU(400, 1000)
     end
 
 
     mSleep(1200)
     closeApp("com.tencent.mm")
-    mSleep(60 * 1000)
+    mSleep(30 * 1000)
 
 end
 
