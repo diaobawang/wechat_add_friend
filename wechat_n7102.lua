@@ -203,12 +203,12 @@ for l in file:lines() do
 
 
         touchButtonForKey("send")
-        sendRequest(tel,1)
+        -- sendRequest(tel,1)
     else
         current_time = os.date("%Y-%m-%d", os.time());
         wLog("wechat_fail.log", current_time .. "  " .. tel .. " " .. remark)
         -- 记一条日志
-        sendRequest(tel,2)
+        -- sendRequest(tel,2)
     end
 
 
