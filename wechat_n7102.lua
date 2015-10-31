@@ -19,10 +19,18 @@ initLog("wechat_fail.log", 0)
 remark = "coachT-学员"
 
 -- 数据文件路径
-path = "/mnt/sdcard/TouchSprite/lua/res3_100"
+path = "/mnt/sdcard/TouchSprite/lua/res3"
+local logFile = io.open("/mnt/sdcard/TouchSprite/lua/log.txt", "r+");
 
 local file = io.open(path,"r");
 
+local lastLineNumber = 0; 
+if logFile
+    then
+        lastLineNumber = logFile:read("*n")
+    else
+        logFile = io.open("/mnt/sdcard/TouchSprite/lua/log.txt", "w")
+end
 
 principalWx="coachT"
 word = "您好，我是健身管家(coachT)的健身教练"
@@ -158,9 +166,17 @@ end
 
 
 
+local currentLine = 1; -- start from 1
 for l in file:lines() do
 
     local tel = l
+    if not lastLineNumber  or currentLine > lastLineNumber 
+        then
+            currentLine = currentLine + 1;
+            logFile:seek("set", 0)
+            logFile:write(currentLine)
+            logFile:flush()
+            print(l)
 
     current_time = os.date("%Y-%m-%d", os.time());
     wLog("wechat.log", current_time .. " begin:  " .. tel .. " " .. remark)
@@ -247,7 +263,13 @@ for l in file:lines() do
     closeApp("com.tencent.mm")
     mSleep(30 * 1000)
 
+        else
+            currentLine = currentLine + 1;
+        end
+
 end
+file:close();
+logFile:close();
 
 
 closeLog("wechat.log")
