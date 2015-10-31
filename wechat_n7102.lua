@@ -22,46 +22,41 @@ remark = "coachT-学员"
 path = "/mnt/sdcard/TouchSprite/lua/res3"
 local logFile = io.open("/mnt/sdcard/TouchSprite/lua/log.txt", "r+");
 
-local file = io.open(path,"r");
+local file = io.open(path, "r");
 
-local lastLineNumber = 0; 
+local lastLineNumber = 0;
 if logFile
-    then
-        lastLineNumber = logFile:read("*n")
-    else
-        logFile = io.open("/mnt/sdcard/TouchSprite/lua/log.txt", "w")
+then
+    lastLineNumber = logFile:read("*n")
+else
+    logFile = io.open("/mnt/sdcard/TouchSprite/lua/log.txt", "w")
 end
 
-principalWx="coachT"
+principalWx = "coachT"
 word = "您好，我是健身管家(coachT)的健身教练"
 
 local addToContactButtonY
 
 
 --   wechat button
-conf={
-    ["add"]={685, 100},
-    ["add_friend"]={550, 300},
-    ["input"]={280, 250},
-    ["input_text"]={300, 100},
+conf = {
+    ["add"] = { 685, 100 },
+    ["add_friend"] = { 550, 300 },
+    ["input"] = { 280, 250 },
+    ["input_text"] = { 300, 100 },
     --["numpad"]={37,1079},
-    ["search"]={655, 1220},
-
-    ["addToContact"]={170,810},
-
-    ["clear"] = {656,310},
-    ["send"]={650, 120},
+    ["search"] = { 655, 1220 },
+    ["addToContact"] = { 170, 810 },
+    ["clear"] = { 656, 310 },
+    ["send"] = { 650, 120 },
 
     -- 没用到
-    ["word"]={234,255},
-
-    ["remark"]={450, 200},
-
-    ["remark2"]={450, 250},
-    ["clear_remark"]={607, 253},
-
-    ["back"]={58,77},
-    ["save"]={387,616},
+    ["word"] = { 234, 255 },
+    ["remark"] = { 450, 200 },
+    ["remark2"] = { 450, 250 },
+    ["clear_remark"] = { 607, 253 },
+    ["back"] = { 58, 77 },
+    ["save"] = { 387, 616 },
 }
 
 
@@ -86,17 +81,17 @@ function isAddToContactButtonValid()
         addToContactButtonY = conf["addToContact"][2]
     else
         toast("not same")
-        for i = 580, 860, 20 
+        for i = 580, 860, 20
         do
             y = i;
-            toast("not same"..i, 0)
+            toast("not same" .. i, 0)
             r, g, b = getColorRGB(conf["addToContact"][1], y);
             result = is_sameColor(r, g, b, 70, 191, 24)
             if result
-                then
-                    addToContactButtonY = y;
-                    break
-                end
+            then
+                addToContactButtonY = y;
+                break
+            end
         end
     end
     return result
@@ -105,34 +100,32 @@ end
 -- post request
 -- post request
 
-function sendRequest(tel,status)
+function sendRequest(tel, status)
     local sz = require("sz")
     local json = sz.json
     local http = require("szocket.http")
     local response_body = {}
-  
-    local post_data = 'tel='..tel.."&status="..status.."&wxname="..principalWx.."&"
 
-    res, code = http.request{  
-        url =  "http://yy.wanmeikouqiang.com/dentistMaintin/modDentistMaintinByLua",  
-        method = "POST",  
-        headers =   
-        {  
-            ["Content-Type"] = "application/x-www-form-urlencoded",  
+    local post_data = 'tel=' .. tel .. "&status=" .. status .. "&wxname=" .. principalWx .. "&"
+
+    res, code = http.request {
+        url = "http://yy.wanmeikouqiang.com/dentistMaintin/modDentistMaintinByLua",
+        method = "POST",
+        headers =
+        {
+            ["Content-Type"] = "application/x-www-form-urlencoded",
             ["content-length"] = string.len(post_data)
-        },  
-        source = ltn12.source.string(post_data),  
-        sink = ltn12.sink.table(response_body)  
-    } 
-
-
+        },
+        source = ltn12.source.string(post_data),
+        sink = ltn12.sink.table(response_body)
+    }
 end
 
 
 -- searchSuccess
 function searchSuccess()
---    snapshot("addBtn.png", 69, 564, 69+20, 564+20)
---    local x, y = findImageInRegionFuzzy("addBtn.png", 60, 0, 293, 640, 1136, 0xffffff);
+    --    snapshot("addBtn.png", 69, 564, 69+20, 564+20)
+    --    local x, y = findImageInRegionFuzzy("addBtn.png", 60, 0, 293, 640, 1136, 0xffffff);
     -- local x, y = findAddBtn()
 
     -- if x ~= -1 then
@@ -160,7 +153,7 @@ end
 -- touch button for key
 function touchButtonForKey(key)
     local x, y
-    x, y = conf[key][1], conf[key][2] 
+    x, y = conf[key][1], conf[key][2]
     touchDU(x, y)
 end
 
@@ -170,103 +163,102 @@ local currentLine = 1; -- start from 1
 for l in file:lines() do
 
     local tel = l
-    if not lastLineNumber  or currentLine > lastLineNumber 
-        then
-            currentLine = currentLine + 1;
-            logFile:seek("set", 0)
-            logFile:write(currentLine)
-            logFile:flush()
-            print(l)
+    if not lastLineNumber or currentLine > lastLineNumber
+    then
+        currentLine = currentLine + 1;
+        logFile:seek("set", 0)
+        logFile:write(currentLine)
+        logFile:flush()
+        print(l)
 
-    current_time = os.date("%Y-%m-%d", os.time());
-    wLog("wechat.log", current_time .. " begin:  " .. tel .. " " .. remark)
-
-    -- close wechat
-    closeApp("com.tencent.mm")
-    mSleep(2000)
-    -- run wechat
-    runApp("com.tencent.mm")
-    mSleep(8000)
-
-
-    -- click tab2
-    -- touchButtonForKey("tab2")
-
-    -- click add
-    touchButtonForKey("add")
-
-    -- click input
-    touchButtonForKey("add_friend")
-
-    -- input
-    touchButtonForKey("input")
-    touchButtonForKey("input_text")
-
-    inputText(tel)
-
-    touchButtonForKey("input_text")
-    -- search
-    touchButtonForKey("search")
-    mSleep(5000)
-
-    if searchSuccess() then
-
-        -- modify remark
-       -- touchButtonForKey("add")
-
-        --touchButtonForKey("remark")
-
-        --touchButtonForKey("remark2")
-        --mSleep(1000)
-        --touchButtonForKey("clear_remark")
-
-        --inputText(remark)
-
-
-        --touchButtonForKey("add")
-
-        --touchButtonForKey("save")
-
-
-        --touchButtonForKey("back")
-
-
---        wLog("wechat.log", conf["addToContact"][1] .. " " .. conf["addToContact"][2])
-        -- click addToContact
---        touchButtonForKey("addToContact")
-        -- local addx, addy = findAddBtn()
-        -- touchDU(addx, addy)
-        
-        --touchButtonForKey("addToContact")
-        touchDU(conf["addToContact"][1], addToContactButtonY)
-        mSleep(2000)
-
-
-        -- input word
-        touchButtonForKey("clear")
-        -- touchButtonForKey("word")
-        inputText(word)
-
-
-        touchButtonForKey("send")
-        -- sendRequest(tel,1)
-    else
         current_time = os.date("%Y-%m-%d", os.time());
-        wLog("wechat_fail.log", current_time .. "  " .. tel .. " " .. remark)
-        -- 记一条日志
-        -- sendRequest(tel,2)
-        touchDU(400, 1000)
-    end
+        wLog("wechat.log", current_time .. " begin:  " .. tel .. " " .. remark)
+
+        -- close wechat
+        closeApp("com.tencent.mm")
+        mSleep(2000)
+        -- run wechat
+        runApp("com.tencent.mm")
+        mSleep(8000)
 
 
-    mSleep(1200)
-    closeApp("com.tencent.mm")
-    mSleep(30 * 1000)
+        -- click tab2
+        -- touchButtonForKey("tab2")
 
+        -- click add
+        touchButtonForKey("add")
+
+        -- click input
+        touchButtonForKey("add_friend")
+
+        -- input
+        touchButtonForKey("input")
+        touchButtonForKey("input_text")
+
+        inputText(tel)
+
+        touchButtonForKey("input_text")
+        -- search
+        touchButtonForKey("search")
+        mSleep(5000)
+
+        if searchSuccess() then
+
+            -- modify remark
+            -- touchButtonForKey("add")
+
+            --touchButtonForKey("remark")
+
+            --touchButtonForKey("remark2")
+            --mSleep(1000)
+            --touchButtonForKey("clear_remark")
+
+            --inputText(remark)
+
+
+            --touchButtonForKey("add")
+
+            --touchButtonForKey("save")
+
+
+            --touchButtonForKey("back")
+
+
+            --        wLog("wechat.log", conf["addToContact"][1] .. " " .. conf["addToContact"][2])
+            -- click addToContact
+            --        touchButtonForKey("addToContact")
+            -- local addx, addy = findAddBtn()
+            -- touchDU(addx, addy)
+
+            --touchButtonForKey("addToContact")
+            touchDU(conf["addToContact"][1], addToContactButtonY)
+            mSleep(2000)
+
+
+            -- input word
+            touchButtonForKey("clear")
+            -- touchButtonForKey("word")
+            inputText(word)
+
+
+            touchButtonForKey("send")
+            -- sendRequest(tel,1)
         else
-            currentLine = currentLine + 1;
+            current_time = os.date("%Y-%m-%d", os.time());
+            wLog("wechat_fail.log", current_time .. "  " .. tel .. " " .. remark)
+            -- 记一条日志
+            -- sendRequest(tel,2)
+            touchDU(400, 1000)
         end
 
+
+        mSleep(1200)
+        closeApp("com.tencent.mm")
+        mSleep(30 * 1000)
+
+    else
+        currentLine = currentLine + 1;
+    end
 end
 file:close();
 logFile:close();
