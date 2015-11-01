@@ -42,6 +42,8 @@ principalWx = "coachT"
 word = "您好，我是健身管家(coachT)的健身教练"
 
 local addToContactButtonY
+local failedCount = 0
+local MAX_FAILED_COUNT = 3;
 
 
 --   wechat button
@@ -250,12 +252,20 @@ for l in file:lines() do
 
             touchButtonForKey("send")
             -- sendRequest(tel,1)
+            failedCount = 0
         else
             current_time = os.date("%Y-%m-%d", os.time());
             wLog("wechat_fail.log", current_time .. "  " .. tel .. " " .. remark)
             -- 记一条日志
             -- sendRequest(tel,2)
             touchDU(400, 1000)
+
+            failedCount = failedCount + 1
+            if failedCount >= MAX_FAILED_COUNT
+            then
+                mSleep(5 * 60 * 1000)
+                failedCount = 0
+            end
         end
 
 
