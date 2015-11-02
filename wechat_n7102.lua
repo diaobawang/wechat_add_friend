@@ -171,10 +171,10 @@ end
 local currentLine = 1; -- start from 1
 for l in file:lines() do
 
-    toast(currentLine.."   "..l)
     local tel = l
     if currentLine > lastLineNumber
     then
+        toast(currentLine.."   "..l)
         currentLine = currentLine + 1;
         logFile:seek("set", 0)
         logFile:write(currentLine)
