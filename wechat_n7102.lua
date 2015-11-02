@@ -22,6 +22,7 @@ local COUNT_PER_TIME = 20 -- 一次添加多少人
 -- 数据文件路径
 path = "/mnt/sdcard/TouchSprite/lua/res3"
 local logFile = io.open("/mnt/sdcard/TouchSprite/lua/log.txt", "r+");
+local failFile = io.open("/mnt/sdcard/TouchSprite/lua/failed.txt", "a");
 
 local file = io.open(path, "r");
 
@@ -53,7 +54,7 @@ conf = {
     ["input"] = { 280, 250 },
     ["input_text"] = { 300, 100 },
     --["numpad"]={37,1079},
-    ["search"] = { 655, 1220 },
+    ["search"] = { 360, 230},
     ["addToContact"] = { 170, 810 },
     ["clear"] = { 656, 310 },
     ["send"] = { 650, 120 },
@@ -188,7 +189,7 @@ for l in file:lines() do
         mSleep(2000)
         -- run wechat
         runApp("com.tencent.mm")
-        mSleep(8000)
+        mSleep(10000)
 
 
         -- click tab2
@@ -206,7 +207,7 @@ for l in file:lines() do
 
         inputText(tel)
 
-        touchButtonForKey("input_text")
+        --touchButtonForKey("input_text")
         -- search
         touchButtonForKey("search")
         mSleep(5000)
@@ -258,8 +259,10 @@ for l in file:lines() do
             wLog("wechat_fail.log", current_time .. "  " .. tel .. " " .. remark)
             -- 记一条日志
             -- sendRequest(tel,2)
-            touchDU(400, 1000)
+            --touchDU(400, 1000)
 
+            failFile:write(l.."\n")
+            failFile:flush()
             failedCount = failedCount + 1
             if failedCount >= MAX_FAILED_COUNT
             then
@@ -284,6 +287,7 @@ for l in file:lines() do
 end
 file:close();
 logFile:close();
+failFile:close();
 
 
 closeLog("wechat.log")
